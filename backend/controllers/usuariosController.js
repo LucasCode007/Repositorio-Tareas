@@ -2,22 +2,19 @@ const supabase = require("../db");
 
 const crearUsuario = async (req, res) => {
   try {
-    const { nombre, email, password } = req.body;
+    const { nombre, email, password, rol } = req.body;
 
-    // 🔴 Validaciones básicas
     if (!nombre || !email || !password) {
       return res.status(400).json({
         error: "Todos los campos son obligatorios",
       });
     }
 
-    // 🔴 Verificar si ya existe el usuario
-    const { data: existe, error: errorConsulta } = await supabase
+    // verificar si ya existe
+    const { data: existe } = await supabase
       .from("usuarios")
       .select("*")
       .eq("email", email);
-
-    if (errorConsulta) throw errorConsulta;
 
     if (existe.length > 0) {
       return res.status(400).json({
@@ -25,16 +22,22 @@ const crearUsuario = async (req, res) => {
       });
     }
 
-    // 🟢 Insertar usuario
     const { data, error } = await supabase
       .from("usuarios")
-      .insert([{ nombre, email, password }])
+      .insert([
+        {
+          nombre,
+          email,
+          password,
+          rol: rol || "estudiante",
+        },
+      ])
       .select();
 
     if (error) throw error;
 
     res.status(201).json({
-      mensaje: "Usuario creado correctamente",
+      mensaje: "Usuario creado",
       usuario: data[0],
     });
 
