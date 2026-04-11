@@ -1,40 +1,51 @@
-const { supabase } = require('../db')
+const supabase = require("../db");
 
 // obtener todas las materias
 const getMaterias = async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('materias')
-            .select('*')
+  try {
+    const { data, error } = await supabase
+      .from("materias")
+      .select("*");
 
-        if (error) throw error
-        res.json(data)
+    if (error) throw error;
 
-    } catch (err) {
-        res.status(500).json({ error: err.message })
-    }
-}
+    res.json(data);
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
 
 // crear una materia nueva
 const createMateria = async (req, res) => {
-    const { nombre, codigo } = req.body
+  try {
+    const { nombre, codigo } = req.body;
 
     if (!nombre || !codigo) {
-        return res.status(400).json({ error: 'Nombre y codigo son requeridos.' })
+      return res.status(400).json({
+        error: "Nombre y codigo son obligatorios",
+      });
     }
 
-    try {
-        const { data, error } = await supabase
-            .from('materias')
-            .insert([{ nombre, codigo }])
-            .select()
+    const { data, error } = await supabase
+      .from("materias")
+      .insert([{ nombre, codigo }])
+      .select();
 
-        if (error) throw error
-        res.status(201).json(data[0])
+    if (error) throw error;
 
-    } catch (err) {
-        res.status(500).json({ error: err.message })
-    }
-}
+    res.status(201).json({
+      mensaje: "Materia creada correctamente",
+      materia: data[0],
+    });
 
-module.exports = { getMaterias, createMateria }
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { getMaterias, createMateria };
