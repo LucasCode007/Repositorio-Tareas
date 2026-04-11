@@ -62,7 +62,7 @@ const obtenerTareas = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("tareas")
-      .select("id,titulo,descripcion,fecha_entrega,usuarios(nombre,email)");
+      .select("id,titulo,descripcion,fecha_entrega,estado,usuarios(nombre,email)");
 
     if (error) throw error;
 
@@ -75,7 +75,40 @@ const obtenerTareas = async (req, res) => {
   }
 };
 
+
+//Cambiar estado de una tarea
+const cambiarEstadoTarea = async (req, res) => {
+  try {
+    const { id } = req.params; // Obtenemos el ID de la URL
+    const { estado } = req.body; // Obtenemos el nuevo estado
+
+    if (!estado) {
+      return res.status(400).json({ error: "El estado es obligatorio" });
+    }
+
+    // Actualizamos en Supabase
+    const { data, error } = await supabase
+      .from("tareas")
+      .update({ estado: estado })
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+
+    res.json({
+      mensaje: "Estado actualizado correctamente",
+      tarea: data[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   crearTarea,
   obtenerTareas,
+  cambiarEstadoTarea
 };
