@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const inscripcionesRoutes = require('./routes/inscripciones')
 
 const app = express();
 
@@ -12,13 +11,10 @@ app.use(express.json());
 // rutas
 const usuariosRoutes = require("./routes/usuarios");
 const tareasRoutes = require("./routes/tareas");
-const materiasRoutes = require('./routes/materias')
 
 // endpoints base
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/tareas", tareasRoutes);
-app.use("/api/materias", materiasRoutes);
-app.use("/api/inscripciones", inscripcionesRoutes);
 
 // ruta de prueba
 app.get("/", (req, res) => {
