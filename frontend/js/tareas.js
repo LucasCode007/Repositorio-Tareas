@@ -44,6 +44,10 @@ async function crearTarea() {
   try {
     const titulo = document.getElementById("titulo").value;
     const descripcion = document.getElementById("descripcion").value;
+    const fecha_entrega = document.getElementById("fecha_entrega").value;
+    const instrucciones = document.getElementById("instrucciones").value;
+    const nota_maxima = document.getElementById("nota_maxima").value;
+    const grupo = document.getElementById("grupo").value;
 
     if (!titulo) {
       alert("El título es obligatorio");
@@ -53,7 +57,11 @@ async function crearTarea() {
     const res = await postTarea({
       titulo,
       descripcion,
-      creador_id: USUARIO.id
+      fecha_entrega,
+      creador_id: USUARIO.id,
+      instrucciones,
+      nota_maxima: nota_maxima ? Number(nota_maxima) : null,
+      grupo
     });
 
     if (res.error) {
@@ -61,12 +69,14 @@ async function crearTarea() {
       return;
     }
 
-    // limpiar inputs
     document.getElementById("titulo").value = "";
     document.getElementById("descripcion").value = "";
+    document.getElementById("fecha_entrega").value = "";
+    document.getElementById("instrucciones").value = "";
+    document.getElementById("nota_maxima").value = "";
+    document.getElementById("grupo").value = "";
 
     cargarTareas();
-
   } catch (error) {
     console.error("Error creando tarea:", error);
   }
