@@ -1,9 +1,9 @@
 const supabase = require("../db");
 
-// 🟢 Crear tarea (SOLO DOCENTES)
+
 const crearTarea = async (req, res) => {
   try {
-    const { titulo, descripcion, fecha_entrega, creador_id } = req.body;
+    const { titulo, descripcion, fecha_entrega, creador_id,instrucciones,nota_maxima,grupo} = req.body;
 
     if (!titulo || !creador_id) {
       return res.status(400).json({
@@ -11,7 +11,6 @@ const crearTarea = async (req, res) => {
       });
     }
 
-    // 🔥 verificar rol del usuario
     const { data: usuario, error: errorUsuario } = await supabase
       .from("usuarios")
       .select("rol")
@@ -39,6 +38,9 @@ const crearTarea = async (req, res) => {
           descripcion,
           fecha_entrega,
           creador_id,
+          instrucciones,
+          nota_maxima,
+          grupo
         },
       ])
       .select();
@@ -62,8 +64,7 @@ const obtenerTareas = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("tareas")
-      .select("id,titulo,descripcion,fecha_entrega,usuarios(nombre,email)");
-
+      .select("id,titulo,descripcion,fecha_entrega,instrucciones,nota_maxima,grupo,estado,usuarios(nombre,email)");
     if (error) throw error;
 
     res.json(data);
@@ -75,7 +76,41 @@ const obtenerTareas = async (req, res) => {
   }
 };
 
+
+//Cambiar estado de una tarea
+const cambiarEstadoTarea = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+
+    if (!estado) {
+      return res.status(400).json({
+        error: "El estado es obligatorio"
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("tareas")
+      .update({ estado })
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+
+    return res.json({
+      mensaje: "Estado actualizado correctamente",
+      tarea: data[0]
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+};
+
+
 module.exports = {
   crearTarea,
   obtenerTareas,
+  cambiarEstadoTarea
 };

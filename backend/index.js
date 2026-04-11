@@ -5,11 +5,10 @@ const inscripcionesRoutes = require('./routes/inscripciones')
 
 const app = express();
 
-// middlewares
+
 app.use(cors());
 app.use(express.json());
 
-// rutas
 const usuariosRoutes = require("./routes/usuarios");
 const tareasRoutes = require("./routes/tareas");
 const materiasRoutes = require('./routes/materias')
@@ -22,10 +21,9 @@ app.use("/api/inscripciones", inscripcionesRoutes);
 
 // ruta de prueba
 app.get("/", (req, res) => {
-  res.send("API de repositorio de tareas funcionando 🚀");
+  res.send("API de repositorio de tareas funcionando");
 });
 
-// levantar servidor
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
