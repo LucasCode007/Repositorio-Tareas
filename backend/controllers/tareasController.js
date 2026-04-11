@@ -62,8 +62,7 @@ const obtenerTareas = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("tareas")
-      .select("id,titulo,descripcion,fecha_entrega,estado,usuarios(nombre,email)");
-
+      .select("id,titulo,descripcion,fecha_entrega,intrucciones,nota_maxima,grupo,estado,usuarios(nombre,email)");
     if (error) throw error;
 
     res.json(data);
