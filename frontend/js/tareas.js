@@ -3,7 +3,7 @@ const contenedor = document.getElementById("tareas");
 // 🔥 SIMULACIÓN (luego esto vendrá del login)
 const USUARIO = {
   id: "5db07d3f-47a7-4969-b9d7-8f255b6570de", // ⚠️ pon el id de un usuario real
-  rol: "estudiante" // cambia a "estudiante" para probar bloqueo
+  rol: "docente" // cambia a "estudiante" para probar bloqueo
 };
 
 if (USUARIO.rol !== "docente") {
@@ -23,11 +23,14 @@ async function cargarTareas() {
       div.innerHTML = `
         <h3>${t.titulo}</h3>
         <p>${t.descripcion || ""}</p>
-        <p><strong>Creador:</strong> ${t.usuarios?.nombre || "?"}</p>
-        <p><strong>Fecha:</strong> ${t.fecha_entrega || "Sin fecha"}</p>
+
+        <p><strong>Instrucciones:</strong> ${t.instrucciones || "Sin instrucciones"}</p>
+        <p><strong>Nota máxima:</strong> ${t.nota_maxima || "-"}</p>
+        <p><strong>Grupo:</strong> ${t.grupo || "-"}</p>
+
+        <p><strong>Creador:</strong> ${t.usuarios?.nombre}</p>
         <hr>
       `;
-
       contenedor.appendChild(div);
     });
 
@@ -41,6 +44,10 @@ async function crearTarea() {
   try {
     const titulo = document.getElementById("titulo").value;
     const descripcion = document.getElementById("descripcion").value;
+    const fecha_entrega = document.getElementById("fecha_entrega").value;
+    const instrucciones = document.getElementById("instrucciones").value;
+    const nota_maxima = document.getElementById("nota_maxima").value;
+    const grupo = document.getElementById("grupo").value;
 
     if (!titulo) {
       alert("El título es obligatorio");
@@ -50,7 +57,11 @@ async function crearTarea() {
     const res = await postTarea({
       titulo,
       descripcion,
-      creador_id: USUARIO.id
+      fecha_entrega,
+      creador_id: USUARIO.id,
+      instrucciones,
+      nota_maxima: nota_maxima ? Number(nota_maxima) : null,
+      grupo
     });
 
     if (res.error) {
@@ -58,12 +69,14 @@ async function crearTarea() {
       return;
     }
 
-    // limpiar inputs
     document.getElementById("titulo").value = "";
     document.getElementById("descripcion").value = "";
+    document.getElementById("fecha_entrega").value = "";
+    document.getElementById("instrucciones").value = "";
+    document.getElementById("nota_maxima").value = "";
+    document.getElementById("grupo").value = "";
 
     cargarTareas();
-
   } catch (error) {
     console.error("Error creando tarea:", error);
   }

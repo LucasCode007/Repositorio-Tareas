@@ -1,9 +1,9 @@
 const supabase = require("../db");
 
-// 🟢 Crear tarea (SOLO DOCENTES)
+
 const crearTarea = async (req, res) => {
   try {
-    const { titulo, descripcion, fecha_entrega, creador_id } = req.body;
+    const { titulo, descripcion, fecha_entrega, creador_id,instrucciones,nota_maxima,grupo} = req.body;
 
     if (!titulo || !creador_id) {
       return res.status(400).json({
@@ -11,7 +11,6 @@ const crearTarea = async (req, res) => {
       });
     }
 
-    // 🔥 verificar rol del usuario
     const { data: usuario, error: errorUsuario } = await supabase
       .from("usuarios")
       .select("rol")
@@ -39,6 +38,9 @@ const crearTarea = async (req, res) => {
           descripcion,
           fecha_entrega,
           creador_id,
+          instrucciones,
+          nota_maxima,
+          grupo
         },
       ])
       .select();
