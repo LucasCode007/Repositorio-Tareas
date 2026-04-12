@@ -12,13 +12,14 @@ app.use(express.json());
 const usuariosRoutes = require("./routes/usuarios");
 const tareasRoutes = require("./routes/tareas");
 const materiasRoutes = require('./routes/materias')
+const comentariosRoutes = require("./routes/comentarios");
 
 // endpoints base
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/tareas", tareasRoutes);
 app.use("/api/materias", materiasRoutes);
 app.use("/api/inscripciones", inscripcionesRoutes);
-
+app.use("/api/comentarios", comentariosRoutes);
 // ruta de prueba
 app.get("/", (req, res) => {
   res.send("API de repositorio de tareas funcionando");
