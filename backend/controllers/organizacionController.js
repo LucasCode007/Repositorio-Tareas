@@ -28,23 +28,52 @@ const getTareasPorMateria = async (req, res) => {
 };
 
 // obtener tareas filtradas por grupo
+// filtrar tareas por grupo (texto)
 const getTareasPorGrupo = async (req, res) => {
   try {
-    const { grupo_id } = req.query;
+    const { grupo } = req.query;
 
-    if (!grupo_id) {
-      return res.status(400).json({ error: "grupo_id es obligatorio" });
+    if (!grupo) {
+      return res.status(400).json({ error: "grupo es obligatorio" });
     }
 
     const { data, error } = await supabase
       .from("tareas")
-      .select("id, titulo, descripcion, fecha_entrega, estado, grupos(nombre)")
-      .eq("grupo_id", grupo_id);
+      .select("id, titulo, descripcion, fecha_entrega, estado, grupo")
+      .eq("grupo", grupo);
 
     if (error) throw error;
 
     if (data.length === 0) {
       return res.status(404).json({ mensaje: "No existen tareas para este grupo" });
+    }
+
+    res.json(data);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// filtrar tareas por materia Y grupo
+const getTareasPorMateriaYGrupo = async (req, res) => {
+  try {
+    const { materia_id, grupo } = req.query;
+
+    if (!materia_id || !grupo) {
+      return res.status(400).json({ error: "materia_id y grupo son obligatorios" });
+    }
+
+    const { data, error } = await supabase
+      .from("tareas")
+      .select("id, titulo, descripcion, fecha_entrega, estado, grupo, materias(nombre, codigo)")
+      .eq("materia_id", materia_id)
+      .eq("grupo", grupo);
+
+    if (error) throw error;
+
+    if (data.length === 0) {
+      return res.status(404).json({ mensaje: "No existen tareas para esta materia y grupo" });
     }
 
     res.json(data);
@@ -106,6 +135,7 @@ const getGrupos = async (req, res) => {
   }
 };
 
+
 // crear un grupo
 const createGrupo = async (req, res) => {
   try {
@@ -135,6 +165,7 @@ const createGrupo = async (req, res) => {
 module.exports = {
   getTareasPorMateria,
   getTareasPorGrupo,
+  getTareasPorMateriaYGrupo,
   getConteoMateria,
   getGrupos,
   createGrupo
