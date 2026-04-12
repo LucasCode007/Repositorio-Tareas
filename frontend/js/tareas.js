@@ -71,3 +71,45 @@ async function crearTarea() {
 
 // 🚀 inicial
 cargarTareas();
+
+
+
+
+// Renderiza el botón/modal de entrega en cada tarjeta de tarea
+function renderizarTarjeta(tarea, usuario) {
+  const card = document.createElement('div');
+  card.className = 'tarea-card';
+
+  card.innerHTML = `
+    <h3>${tarea.titulo}</h3>
+    <p>${tarea.descripcion}</p>
+    <small>Entrega: ${new Date(tarea.fecha_entrega).toLocaleDateString()}</small>
+    <small>Creado por: ${tarea.usuarios?.nombre ?? 'Desconocido'}</small>
+  `;
+
+  // Solo estudiantes ven el botón de entrega
+  if (usuario.rol === 'estudiante') {
+    const btn = document.createElement('button');
+    btn.textContent = 'Entregar';
+    btn.onclick = () => mostrarFormularioEntrega(tarea.id, usuario.id);
+    card.appendChild(btn);
+  }
+
+  return card;
+}
+
+function mostrarFormularioEntrega(tarea_id, estudiante_id) {
+  // Reutiliza un modal ya existente o crea uno simple
+  const contenido = prompt('Escribe tu entrega o pega el enlace:');
+  if (!contenido || contenido.trim() === '') return;
+
+  entregarTarea(tarea_id, estudiante_id, contenido.trim())
+    .then(res => {
+      if (res.error) {
+        alert(`Error: ${res.error}`);
+      } else {
+        alert('¡Tarea entregada correctamente!');
+      }
+    })
+    .catch(() => alert('Error de conexión con el servidor.'));
+}
