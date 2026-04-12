@@ -3,11 +3,15 @@ const express = require("express");
 const cors = require("cors");
 const inscripcionesRoutes = require('./routes/inscripciones')
 
+const entregasRoutes = require('./routes/entregas')
+
 const app = express();
 
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/entregas", entregasRoutes);
 
 const usuariosRoutes = require("./routes/usuarios");
 const tareasRoutes = require("./routes/tareas");
