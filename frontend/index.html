@@ -2,32 +2,46 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Repositorio de Tareas</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Tareas</title>
+
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/modal.css">
 </head>
 <body>
 
   <h1>Repositorio de Tareas</h1>
 
   <section id="form-crear">
-  <h2>Crear Tarea</h2>
-  <input type="text" id="titulo" placeholder="Título">
-  <input type="text" id="descripcion" placeholder="Descripción">
-  <input type="date" id="fecha_entrega" placeholder="Fecha de entrega">
-  <input type="text" id="instrucciones" placeholder="Instrucciones">
-  <input type="number" id="nota_maxima" placeholder="Nota máxima">
-  <input type="text" id="grupo" placeholder="Grupo">
-  <button onclick="crearTarea()">Crear</button>
-</section>
+    <h2>Crear Tarea</h2>
 
-  <hr>
+    <input type="text" id="titulo" placeholder="Título">
+    <input type="text" id="descripcion" placeholder="Descripción">
+    <input type="date" id="fecha_entrega">
+    <input type="text" id="instrucciones" placeholder="Instrucciones">
+    <input type="number" id="nota_maxima" placeholder="Nota máxima">
+    <input type="text" id="grupo" placeholder="Grupo">
 
-  <section>
-    <h2>Lista de Tareas</h2>
-    <div id="tareas"></div>
+    <button onclick="crearTarea()">Crear</button>
+  </section>
+  <section id="modulo-materias">
+  <h2>Materias disponibles</h2>
+  <div id="lista-materias"></div>
   </section>
 
-  <script src="js/api.js"></script>
-  <script src="js/tareas.js"></script>
+  <section id="modulo-inscripciones">
+    <h2>Mis inscripciones</h2>
+    <div id="lista-inscripciones"></div>
+  </section>
+  <!-- LISTA -->
+  <section>
+    <h2>Lista de tareas</h2>
+    <div id="tareas"></div>
+  
+  <!-- 🔥 IMPORTANTE: ORDEN -->
+  <script src="./js/api.js"></script>
+  <script src="./js/tareas.js"></script>
+  <script src="./js/detalles.js"></script>
+  <script src="./js/inscripciones.js"></script>
+
 </body>
 </html>

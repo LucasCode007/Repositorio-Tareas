@@ -1,45 +1,62 @@
 const contenedor = document.getElementById("tareas");
 
-// 🔥 SIMULACIÓN (luego esto vendrá del login)
+// Simulación temporal
 const USUARIO = {
-  id: "5db07d3f-47a7-4969-b9d7-8f255b6570de", // ⚠️ pon el id de un usuario real
-  rol: "docente" // cambia a "estudiante" para probar bloqueo
+  id: "TU_ID_REAL",
+  rol: "docente"
 };
 
+// Ocultar formulario si no es docente
 if (USUARIO.rol !== "docente") {
   document.querySelector("#form-crear").style.display = "none";
 }
 
-// 🟢 cargar tareas
+// Cargar tareas
 async function cargarTareas() {
   try {
     const tareas = await getTareas();
 
     contenedor.innerHTML = "";
 
-    tareas.forEach(t => {
+    tareas.forEach((t) => {
       const div = document.createElement("div");
+      div.className = "card-tarea";
+
+      const estadoTexto = t.estado || "pendiente";
 
       div.innerHTML = `
         <h3>${t.titulo}</h3>
         <p>${t.descripcion || ""}</p>
-
         <p><strong>Instrucciones:</strong> ${t.instrucciones || "Sin instrucciones"}</p>
-        <p><strong>Nota máxima:</strong> ${t.nota_maxima || "-"}</p>
+        <p><strong>Nota máxima:</strong> ${t.nota_maxima ?? "-"}</p>
         <p><strong>Grupo:</strong> ${t.grupo || "-"}</p>
+        <p><strong>Fecha:</strong> ${t.fecha_entrega || "Sin fecha"}</p>
+        <p><strong>Creador:</strong> ${t.usuarios?.nombre || "Desconocido"}</p>
+        <p><strong>Estado:</strong> 
+          <span class="estado-badge estado-${estadoTexto}">
+            ${estadoTexto}
+          </span>
+        </p>
 
-        <p><strong>Creador:</strong> ${t.usuarios?.nombre}</p>
+        <div class="acciones-estado">
+          <button onclick="cambiarEstado('${t.id}', 'pendiente')">Pendiente</button>
+          <button onclick="cambiarEstado('${t.id}', 'en_progreso')">En progreso</button>
+          <button onclick="cambiarEstado('${t.id}', 'completada')">Completada</button>
+        </div>
+
+        <button class="btn-ver-detalles" onclick="abrirDetalle('${t.id}')">Ver Detalles Completos</button>
+
         <hr>
       `;
+
       contenedor.appendChild(div);
     });
-
   } catch (error) {
     console.error("Error cargando tareas:", error);
   }
 }
 
-// 🟢 crear tarea
+// Crear tarea
 async function crearTarea() {
   try {
     const titulo = document.getElementById("titulo").value;
@@ -82,5 +99,21 @@ async function crearTarea() {
   }
 }
 
-// 🚀 inicial
+// Cambiar estado
+async function cambiarEstado(id, estado) {
+  try {
+    const res = await patchEstadoTarea(id, estado);
+
+    if (res.error) {
+      alert(res.error);
+      return;
+    }
+
+    cargarTareas();
+  } catch (error) {
+    console.error("Error cambiando estado:", error);
+  }
+}
+
+// Inicial
 cargarTareas();
