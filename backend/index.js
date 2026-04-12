@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const inscripcionesRoutes = require('./routes/inscripciones')
+const organizacionRoutes = require('./routes/organizacion')
+const entregasRoutes = require('./routes/entregas')
 
 const entregasRoutes = require('./routes/entregas')
 
@@ -10,6 +12,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/organizacion", organizacionRoutes);
+app.use("/api/entregas", entregasRoutes);
 
 app.use("/api/entregas", entregasRoutes);
 

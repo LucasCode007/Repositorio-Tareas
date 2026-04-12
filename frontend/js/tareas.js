@@ -27,10 +27,8 @@ async function cargarTareas() {
       div.innerHTML = `
         <h3>${t.titulo}</h3>
         <p>${t.descripcion || ""}</p>
-        <p><strong>Instrucciones:</strong> ${t.instrucciones || "Sin instrucciones"}</p>
         <p><strong>Nota máxima:</strong> ${t.nota_maxima ?? "-"}</p>
         <p><strong>Grupo:</strong> ${t.grupo || "-"}</p>
-        <p><strong>Fecha:</strong> ${t.fecha_entrega || "Sin fecha"}</p>
         <p><strong>Creador:</strong> ${t.usuarios?.nombre || "Desconocido"}</p>
         <p><strong>Estado:</strong> 
           <span class="estado-badge estado-${estadoTexto}">
