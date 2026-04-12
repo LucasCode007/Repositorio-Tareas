@@ -90,9 +90,12 @@ const obtenerEntregasPorEstudiante = async (req, res) => {
     .from('entregas')
     .select(`
       id,
+      tarea_id,
       contenido,
       fecha_entrega,
       estado,
+      calificacion,
+      retroalimentacion,
       tareas:tarea_id (titulo, fecha_entrega)
     `)
     .eq('estudiante_id', estudiante_id)
@@ -178,9 +181,47 @@ const calificarEntrega = async (req, res) => {
   res.json({ mensaje: 'Entrega calificada correctamente.', entrega: data });
 };
 
+const eliminarEntrega = async (req, res) => {
+  const { id } = req.params;
+  const { estudiante_id } = req.body;
+
+  if (!estudiante_id) {
+    return res.status(400).json({ error: 'Falta el estudiante_id.' });
+  }
+
+  // Verificar que la entrega existe y pertenece al estudiante
+  const { data: entrega, error: errorEntrega } = await supabase
+    .from('entregas')
+    .select('id, estudiante_id, estado')
+    .eq('id', id)
+    .single();
+
+  if (errorEntrega || !entrega) {
+    return res.status(404).json({ error: 'Entrega no encontrada.' });
+  }
+
+  if (entrega.estudiante_id !== estudiante_id) {
+    return res.status(403).json({ error: 'No puedes eliminar la entrega de otro estudiante.' });
+  }
+
+  if (entrega.estado === 'calificada') {
+    return res.status(403).json({ error: 'No puedes eliminar una entrega ya calificada.' });
+  }
+
+  const { error } = await supabase
+    .from('entregas')
+    .delete()
+    .eq('id', id);
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  res.json({ mensaje: 'Entrega eliminada correctamente.' });
+};
+
 module.exports = {
   crearEntrega,
   obtenerEntregasPorTarea,
   obtenerEntregasPorEstudiante,
-  calificarEntrega
+  calificarEntrega,
+  eliminarEntrega
 };
