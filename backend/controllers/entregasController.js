@@ -180,9 +180,76 @@ const eliminarEntrega = async (req, res) => {
   }
 };
 
+const calificarEntrega = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { docente_id, calificacion, retroalimentacion } = req.body;
+
+    if (!docente_id || calificacion === undefined) {
+      return res.status(400).json({ error: "Faltan campos obligatorios." });
+    }
+
+    if (calificacion < 0 || calificacion > 100) {
+      return res.status(400).json({
+        error: "La calificación debe estar entre 0 y 100."
+      });
+    }
+
+    const { data: usuario, error: errorUsuario } = await supabase
+      .from("usuarios")
+      .select("rol")
+      .eq("id", docente_id)
+      .single();
+
+    if (errorUsuario || !usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado." });
+    }
+
+    if (usuario.rol !== "docente") {
+      return res.status(403).json({
+        error: "Solo los docentes pueden calificar entregas."
+      });
+    }
+
+    const { data: entrega, error: errorEntrega } = await supabase
+      .from("entregas")
+      .select("id, estado, estudiante_id")
+      .eq("id", id)
+      .single();
+
+    if (errorEntrega || !entrega) {
+      return res.status(404).json({ error: "Entrega no encontrada." });
+    }
+
+    const { data, error } = await supabase
+      .from("entregas")
+      .update({
+        calificacion,
+        retroalimentacion: retroalimentacion || null,
+        estado: "calificada",
+        fecha_calificacion: new Date().toISOString()
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.json({
+      mensaje: "Entrega calificada correctamente.",
+      entrega: data
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   crearEntrega,
   obtenerEntregasPorTarea,
   obtenerEntregasPorEstudiante,
-  eliminarEntrega
+  eliminarEntrega,
+  calificarEntrega
 };
