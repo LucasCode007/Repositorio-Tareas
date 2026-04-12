@@ -2,7 +2,7 @@ const contenedor = document.getElementById("tareas");
 
 // Simulación temporal
 const USUARIO = {
-  id: "TU_ID_REAL",
+  id: "46b15198-b5d4-4455-994e-12e0382db3c9",
   rol: "docente"
 };
 
