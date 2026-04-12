@@ -8,6 +8,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/organizacion", organizacionRoutes);
 
 const usuariosRoutes = require("./routes/usuarios");
 const tareasRoutes = require("./routes/tareas");
