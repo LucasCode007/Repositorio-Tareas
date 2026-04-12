@@ -54,3 +54,33 @@ async function eliminarInscripcion(id) {
   });
   return res.json();
 }
+
+// ─── US2: Entregas ───────────────────────────────────────
+
+async function entregarTarea(tarea_id, estudiante_id, contenido) {
+  const res = await fetch(`${API_URL}/entregas`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tarea_id, estudiante_id, contenido })
+  });
+  return res.json();
+}
+
+async function obtenerEntregasDeTarea(tarea_id, solicitante_id) {
+  const res = await fetch(`${API_URL}/entregas/tarea/${tarea_id}?solicitante_id=${solicitante_id}`);
+  return res.json();
+}
+
+async function obtenerMisEntregas(estudiante_id) {
+  const res = await fetch(`${API_URL}/entregas/estudiante/${estudiante_id}`);
+  return res.json();
+}
+
+async function eliminarEntrega(entrega_id, estudiante_id) {
+  const res = await fetch(`${API_URL}/entregas/${entrega_id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ estudiante_id })
+  });
+  return res.json();
+}
