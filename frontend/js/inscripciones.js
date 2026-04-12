@@ -1,46 +1,111 @@
-const API = "http://localhost:3000/api"
+const contenedorMaterias = document.getElementById("lista-materias");
+const contenedorInscripciones = document.getElementById("lista-inscripciones");
 
-// obtener materias disponibles
+const USUARIO_INSCRIPCION = {
+  id: "96b507af-b5e3-47f8-be6d-9e727476d83d",
+  rol: "estudiante"
+};
+
 async function cargarMaterias() {
-    const res = await fetch(`${API}/materias`)
-    const data = await res.json()
-    return data
+  try {
+    const materias = await getMaterias();
+    contenedorMaterias.innerHTML = "";
+
+    if (!materias.length) {
+      contenedorMaterias.innerHTML = "<p>No hay materias disponibles.</p>";
+      return;
+    }
+
+    materias.forEach((m) => {
+      const div = document.createElement("div");
+      div.className = "card-materia";
+
+      div.innerHTML = `
+        <h3>${m.nombre}</h3>
+        <p><strong>Código:</strong> ${m.codigo}</p>
+        <button onclick="inscribirme('${m.id}')">Inscribirme</button>
+      `;
+
+      contenedorMaterias.appendChild(div);
+    });
+  } catch (error) {
+    console.error("Error cargando materias:", error);
+  }
 }
 
-// inscribir estudiante a una materia
-async function inscribir(usuario_id, materia_id) {
-    const res = await fetch(`${API}/inscripciones`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario_id, materia_id })
-    })
-    const data = await res.json()
-    return data
+async function cargarInscripciones() {
+  try {
+    const inscripciones = await getInscripciones(USUARIO_INSCRIPCION.id);
+    contenedorInscripciones.innerHTML = "";
+
+    if (!inscripciones.length) {
+      contenedorInscripciones.innerHTML = "<p>No estás inscrito en ninguna materia.</p>";
+      return;
+    }
+
+    inscripciones.forEach((i) => {
+      const materia = i.materias;
+
+      const div = document.createElement("div");
+      div.className = "card-inscripcion";
+
+      div.innerHTML = `
+        <h3>${materia?.nombre || "Materia"}</h3>
+        <p><strong>Código:</strong> ${materia?.codigo || "-"}</p>
+        <p><strong>Fecha:</strong> ${i.fecha || "-"}</p>
+        <button onclick="borrarInscripcion('${i.id}')">Eliminar</button>
+      `;
+
+      contenedorInscripciones.appendChild(div);
+    });
+  } catch (error) {
+    console.error("Error cargando inscripciones:", error);
+  }
 }
 
-// obtener materias de un estudiante
-async function getMisInscripciones(usuario_id) {
-    const res = await fetch(`${API}/inscripciones/${usuario_id}`)
-    const data = await res.json()
-    return data
+async function inscribirme(materiaId) {
+  try {
+    const inscripciones = await getInscripciones(USUARIO_INSCRIPCION.id);
+
+    const yaInscrito = inscripciones.some(i => i.materias?.id === materiaId);
+
+    if (yaInscrito) {
+      alert("Ya estás inscrito en esta materia");
+      return;
+    }
+
+    const res = await crearInscripcion({
+      usuario_id: USUARIO_INSCRIPCION.id,
+      materia_id: materiaId
+    });
+
+    if (res.error) {
+      alert(res.error);
+      return;
+    }
+
+    cargarMaterias();
+    cargarInscripciones();
+  } catch (error) {
+    console.error("Error creando inscripción:", error);
+  }
 }
 
-// eliminar inscripcion
-async function eliminarInscripcion(id) {
-    const res = await fetch(`${API}/inscripciones/${id}`, {
-        method: "DELETE"
-    })
-    const data = await res.json()
-    return data
+async function borrarInscripcion(id) {
+  try {
+    const res = await eliminarInscripcion(id);
+
+    if (res.error) {
+      alert(res.error);
+      return;
+    }
+
+    cargarMaterias();
+    cargarInscripciones();
+  } catch (error) {
+    console.error("Error eliminando inscripción:", error);
+  }
 }
 
-// validar correo
-async function validarCorreo(email) {
-    const res = await fetch(`${API}/inscripciones/validar-correo`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
-    })
-    const data = await res.json()
-    return data
-}
+cargarMaterias();
+cargarInscripciones();

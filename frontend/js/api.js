@@ -13,7 +13,6 @@ async function postTarea(data) {
     },
     body: JSON.stringify(data)
   });
-
   return res.json();
 }
 
@@ -25,6 +24,33 @@ async function patchEstadoTarea(id, estado) {
     },
     body: JSON.stringify({ estado })
   });
+  return res.json();
+}
 
+async function getMaterias() {
+  const res = await fetch(`${API_URL}/materias`);
+  return res.json();
+}
+
+async function crearInscripcion(data) {
+  const res = await fetch(`${API_URL}/inscripciones`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+async function getInscripciones(usuarioId) {
+  const res = await fetch(`${API_URL}/inscripciones/${usuarioId}`);
+  return res.json();
+}
+
+async function eliminarInscripcion(id) {
+  const res = await fetch(`${API_URL}/inscripciones/${id}`, {
+    method: "DELETE"
+  });
   return res.json();
 }
