@@ -113,3 +113,51 @@ function mostrarFormularioEntrega(tarea_id, estudiante_id) {
     })
     .catch(() => alert('Error de conexión con el servidor.'));
 }
+
+// Renderiza lista de entregas con opción de calificar (vista docente)
+function renderizarEntregas(entregas, docente_id) {
+  entregas.forEach(entrega => {
+    const div = document.createElement('div');
+    div.className = 'entrega-card';
+    div.innerHTML = `
+      <p><strong>Estudiante:</strong> ${entrega.usuarios?.nombre}</p>
+      <p><strong>Entrega:</strong> ${entrega.contenido}</p>
+      <p><strong>Estado:</strong> ${entrega.estado}</p>
+      <p><strong>Nota:</strong> ${entrega.calificacion ?? 'Sin calificar'}</p>
+    `;
+
+    // Solo mostrar botón si no está calificada aún
+    if (entrega.estado !== 'calificada') {
+      const btn = document.createElement('button');
+      btn.textContent = 'Calificar';
+      btn.onclick = () => mostrarFormularioCalificacion(entrega.id, docente_id);
+      div.appendChild(btn);
+    }
+
+    document.getElementById('lista-entregas').appendChild(div);
+  });
+}
+
+function mostrarFormularioCalificacion(entrega_id, docente_id) {
+  const calificacion = prompt('Ingresa la nota (0-100):');
+  if (calificacion === null) return;
+
+  const nota = parseFloat(calificacion);
+  if (isNaN(nota) || nota < 0 || nota > 100) {
+    alert('Nota inválida. Debe ser un número entre 0 y 100.');
+    return;
+  }
+
+  const retroalimentacion = prompt('Retroalimentación (opcional):');
+
+  calificarEntrega(entrega_id, docente_id, nota, retroalimentacion)
+    .then(res => {
+      if (res.error) {
+        alert(`Error: ${res.error}`);
+      } else {
+        alert(`Entrega calificada con nota: ${nota}`);
+        location.reload();
+      }
+    })
+    .catch(() => alert('Error de conexión.'));
+};
