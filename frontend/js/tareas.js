@@ -44,6 +44,8 @@ async function cargarTareas() {
           <button onclick="cambiarEstado('${t.id}', 'completada')">Completada</button>
         </div>
 
+        <button class="btn-ver-detalles" onclick="abrirDetalle('${t.id}')">Ver Detalles Completos</button>
+
         <hr>
       `;
 
