@@ -5,7 +5,8 @@ const {
   obtenerEntregasPorTarea,
   obtenerEntregasPorEstudiante,
   eliminarEntrega,
-  calificarEntrega
+  calificarEntrega, 
+  reemplazarEntrega
 } = require('../controllers/entregasController');
 
 router.post('/', crearEntrega);
@@ -13,5 +14,6 @@ router.get('/tarea/:tarea_id', obtenerEntregasPorTarea);
 router.get('/estudiante/:estudiante_id', obtenerEntregasPorEstudiante);
 router.delete('/:id', eliminarEntrega);
 router.patch('/:id/calificar', calificarEntrega);
+router.patch('/:id/reemplazar', reemplazarEntrega);
 
 module.exports = router;
