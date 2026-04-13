@@ -55,12 +55,10 @@ async function eliminarInscripcion(id) {
   return res.json();
 }
 
-// ─── US2: Entregas ───────────────────────────────────────
-
 async function entregarTarea(tarea_id, estudiante_id, contenido) {
   const res = await fetch(`${API_URL}/entregas`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ tarea_id, estudiante_id, contenido })
   });
   return res.json();
@@ -78,8 +76,8 @@ async function obtenerMisEntregas(estudiante_id) {
 
 async function eliminarEntrega(entrega_id, estudiante_id) {
   const res = await fetch(`${API_URL}/entregas/${entrega_id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ estudiante_id })
   });
   return res.json();
