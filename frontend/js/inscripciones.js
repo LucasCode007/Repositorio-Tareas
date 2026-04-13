@@ -53,7 +53,12 @@ async function cargarInscripciones() {
         <h3>${materia?.nombre || "Materia"}</h3>
         <p><strong>Código:</strong> ${materia?.codigo || "-"}</p>
         <p><strong>Fecha:</strong> ${i.fecha || "-"}</p>
-        <button onclick="borrarInscripcion('${i.id}')">Eliminar</button>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button style="background: #17a2b8; color: white;" onclick="abrirMuroMateria('${materia?.id}', '${materia?.nombre}')">💬 Ver Muro de la Clase</button>
+
+        <button onclick="borrarInscripcion('${i.id}')" style="background: #dc3545; color: white;">Eliminar</button>
+        </div>
       `;
 
       contenedorInscripciones.appendChild(div);

@@ -54,3 +54,28 @@ async function eliminarInscripcion(id) {
   });
   return res.json();
 }
+
+//Obtener comentarios de una tarea específica
+async function getComentariosTarea(tarea_id) {
+  const res = await fetch(`${API_URL}/comentarios/tarea/${tarea_id}`);
+  return res.json();
+}
+
+//Post nuevo comentario
+async function postComentario(data) {
+  const res = await fetch(`${API_URL}/comentarios`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+
+  return res.json();
+}
+
+// Obtener comentarios generales de una materia (Muro)
+async function getComentariosMateria(materia_id) {
+  const res = await fetch(`${API_URL}/comentarios/materia/${materia_id}`);
+  return res.json();
+}
