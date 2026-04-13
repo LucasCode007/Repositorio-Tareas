@@ -2,8 +2,8 @@ const contenedor = document.getElementById("tareas");
 
 // Simulación temporal
 const USUARIO = JSON.parse(localStorage.getItem("usuario")) || {
-  id: "62ab5bd7-fb96-4f07-bc71-c269289b796c",
-  rol: "estudiante"
+  id: "46b15198-b5d4-4455-994e-12e0382db3c9",
+  rol: "docente"
 };
 
 // Ocultar formulario si no es docente

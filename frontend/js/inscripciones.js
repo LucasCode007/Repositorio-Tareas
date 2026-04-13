@@ -2,7 +2,7 @@ const contenedorMaterias = document.getElementById("lista-materias");
 const contenedorInscripciones = document.getElementById("lista-inscripciones");
 
 const USUARIO_INSCRIPCION = {
-  id: "62ab5bd7-fb96-4f07-bc71-c269289b796c",
+  id: "d097a79b-e0af-43a9-86f8-ffbb3576f793",
   rol: "estudiante"
 };
 
