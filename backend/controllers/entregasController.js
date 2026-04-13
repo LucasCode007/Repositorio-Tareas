@@ -100,7 +100,7 @@ const obtenerEntregasPorTarea = async (req, res) => {
 
     const { data, error } = await supabase
       .from("entregas")
-      .select("id,contenido,fecha_entrega,estado,usuarios(nombre, email)")
+      .select("id,contenido,fecha_entrega,estado,estudiante_id,usuarios(nombre, email)")
       .eq("tarea_id", tarea_id)
       .order("fecha_entrega", { ascending: false });
 

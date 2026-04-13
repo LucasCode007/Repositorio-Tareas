@@ -1,5 +1,5 @@
 const usuarioActual = JSON.parse(localStorage.getItem("usuario")) || {
-  id: "96b507af-b5e3-47f8-be6d-9e727476d83d",
+  id: "62ab5bd7-fb96-4f07-bc71-c269289b796c",
   rol: "estudiante"
 };
 

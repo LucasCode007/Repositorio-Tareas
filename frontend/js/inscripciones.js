@@ -2,7 +2,7 @@ const contenedorMaterias = document.getElementById("lista-materias");
 const contenedorInscripciones = document.getElementById("lista-inscripciones");
 
 const USUARIO_INSCRIPCION = {
-  id: "96b507af-b5e3-47f8-be6d-9e727476d83d",
+  id: "62ab5bd7-fb96-4f07-bc71-c269289b796c",
   rol: "estudiante"
 };
 
@@ -53,7 +53,12 @@ async function cargarInscripciones() {
         <h3>${materia?.nombre || "Materia"}</h3>
         <p><strong>Código:</strong> ${materia?.codigo || "-"}</p>
         <p><strong>Fecha:</strong> ${i.fecha || "-"}</p>
-        <button onclick="borrarInscripcion('${i.id}')">Eliminar</button>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button style="background: #17a2b8; color: white;" onclick="abrirMuroMateria('${materia?.id}', '${materia?.nombre}')">💬 Ver Muro de la Clase</button>
+
+        <button onclick="borrarInscripcion('${i.id}')" style="background: #dc3545; color: white;">Eliminar</button>
+        </div>
       `;
 
       contenedorInscripciones.appendChild(div);

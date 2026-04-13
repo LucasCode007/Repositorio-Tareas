@@ -8,9 +8,7 @@ async function getTareas() {
 async function postTarea(data) {
   const res = await fetch(`${API_URL}/tareas`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   });
   return res.json();
@@ -19,9 +17,7 @@ async function postTarea(data) {
 async function patchEstadoTarea(id, estado) {
   const res = await fetch(`${API_URL}/tareas/${id}/estado`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ estado })
   });
   return res.json();
@@ -35,9 +31,7 @@ async function getMaterias() {
 async function crearInscripcion(data) {
   const res = await fetch(`${API_URL}/inscripciones`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   });
   return res.json();
@@ -55,6 +49,7 @@ async function eliminarInscripcion(id) {
   return res.json();
 }
 
+//FUNCIONES DE ENTREGAS Y CALIFICACIONES
 async function entregarTarea(tarea_id, estudiante_id, contenido) {
   const res = await fetch(`${API_URL}/entregas`, {
     method: "POST",
@@ -83,8 +78,6 @@ async function eliminarEntrega(entrega_id, estudiante_id) {
   return res.json();
 }
 
-// ─── US5: Calificaciones ──────────────────────────────────
-
 async function calificarEntrega(entrega_id, docente_id, calificacion, retroalimentacion) {
   const res = await fetch(`${API_URL}/entregas/${entrega_id}/calificar`, {
     method: 'PATCH',
@@ -102,5 +95,23 @@ async function reemplazarEntrega(entrega_id, estudiante_id, contenido) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ estudiante_id, contenido })
   });
+  return res.json();
+// ─── TUS FUNCIONES DE COMENTARIOS ───
+async function getComentariosTarea(tarea_id) {
+  const res = await fetch(`${API_URL}/comentarios/tarea/${tarea_id}`);
+  return res.json();
+}
+
+async function postComentario(data) {
+  const res = await fetch(`${API_URL}/comentarios`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+async function getComentariosMateria(materia_id) {
+  const res = await fetch(`${API_URL}/comentarios/materia/${materia_id}`);
   return res.json();
 }
