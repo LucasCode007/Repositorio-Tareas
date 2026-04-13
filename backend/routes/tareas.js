@@ -4,7 +4,8 @@ const router = express.Router();
 const {
   crearTarea,
   obtenerTareas,
-  cambiarEstadoTarea
+  cambiarEstadoTarea,
+  updateTarea  
 } = require("../controllers/tareasController");
 
 // crear tarea
@@ -15,5 +16,8 @@ router.get("/", obtenerTareas);
 
 //actualizar estado de la tarea
 router.patch("/:id/estado", cambiarEstadoTarea);
+
+//actualizar estado de la tarea editada 
+router.put("/:id", updateTarea);
 
 module.exports = router;
