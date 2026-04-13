@@ -246,10 +246,74 @@ const calificarEntrega = async (req, res) => {
   }
 };
 
+const reemplazarEntrega = async (req, res) => {
+  const { id } = req.params;
+  const { estudiante_id, contenido } = req.body;
+
+  if (!estudiante_id || !contenido) {
+    return res.status(400).json({ error: 'Faltan campos obligatorios.' });
+  }
+
+  // Verificar que la entrega existe y pertenece al estudiante
+  const { data: entrega, error: errorEntrega } = await supabase
+    .from('entregas')
+    .select('id, estudiante_id, estado, tarea_id')
+    .eq('id', id)
+    .single();
+
+  if (errorEntrega || !entrega) {
+    return res.status(404).json({ error: 'Entrega no encontrada.' });
+  }
+
+  if (entrega.estudiante_id !== estudiante_id) {
+    return res.status(403).json({ error: 'No puedes modificar la entrega de otro estudiante.' });
+  }
+
+  if (entrega.estado === 'calificada') {
+    return res.status(403).json({ error: 'No puedes reemplazar una entrega ya calificada.' });
+  }
+
+  // Validar que la tarea no haya vencido
+  const { data: tarea, error: errorTarea } = await supabase
+    .from('tareas')
+    .select('fecha_entrega')
+    .eq('id', entrega.tarea_id)
+    .single();
+
+  if (errorTarea || !tarea) {
+    return res.status(404).json({ error: 'Tarea no encontrada.' });
+  }
+
+  if (tarea.fecha_entrega) {
+    const fechaLimite = new Date(tarea.fecha_entrega + 'T23:59:59');
+    const ahora = new Date();
+    if (ahora > fechaLimite) {
+      return res.status(403).json({ error: 'El plazo de entrega ha vencido. No puedes reemplazar la entrega.' });
+    }
+  }
+
+  // Reemplazar contenido y actualizar fecha
+  const { data, error } = await supabase
+    .from('entregas')
+    .update({
+      contenido,
+      fecha_entrega: new Date().toISOString()
+    })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  res.json({ mensaje: 'Entrega reemplazada correctamente.', entrega: data });
+};
+
 module.exports = {
   crearEntrega,
   obtenerEntregasPorTarea,
   obtenerEntregasPorEstudiante,
   eliminarEntrega,
-  calificarEntrega
+  calificarEntrega, 
+  reemplazarEntrega
 };
+

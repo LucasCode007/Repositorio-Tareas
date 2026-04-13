@@ -87,6 +87,15 @@ async function calificarEntrega(entrega_id, docente_id, calificacion, retroalime
   return res.json();
 }
 
+
+// ─── US9: Reemplazar entrega ──────────────────────────────
+async function reemplazarEntrega(entrega_id, estudiante_id, contenido) {
+  const res = await fetch(`${API_URL}/entregas/${entrega_id}/reemplazar`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ estudiante_id, contenido })
+  });
+  return res.json();
 // ─── TUS FUNCIONES DE COMENTARIOS ───
 async function getComentariosTarea(tarea_id) {
   const res = await fetch(`${API_URL}/comentarios/tarea/${tarea_id}`);
