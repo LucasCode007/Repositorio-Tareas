@@ -60,3 +60,60 @@
   color: white;
   margin-top: 10px;
 }
+
+/* Estilo para comentarios */
+.seccion-comentarios {
+  margin-top: 20px;
+  border-top: 2px solid #eee;
+  padding-top: 15px;
+}
+
+.lista-comentarios {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-right: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comentario-item {
+  background: #f1f3f5;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 0.9em;
+  width: fit-content;
+  max-width: 90%;
+}
+
+.comentario-autor {
+  font-weight: bold;
+  color: #0056b3;
+  margin-bottom: 4px;
+  display: block;
+  font-size: 0.85em;
+}
+
+.caja-escribir-comentario {
+  display: flex;
+  gap: 10px;
+}
+
+.caja-escribir-comentario input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  outline: none;
+}
+
+.btn-enviar-comentario {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
