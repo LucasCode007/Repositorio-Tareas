@@ -23,21 +23,26 @@ async function abrirDetalle(id) {
 
     // LÓGICA ROL DOCENTE
     if (USUARIO.rol === "docente") {
-      if (estaVencida) {
-        botonesHTML = `
-          <div class="seccion-detalle" style="background: #f8d7da; color: #721c24; border-color: #f5c6cb;">
-            <strong>⚠️ El plazo de entrega ha vencido.</strong>
-          </div>
-          <button class="btn-accion btn-deshabilitado" disabled>Subir Archivo (Bloqueado)</button>
-          <button class="btn-accion btn-deshabilitado" disabled>Editar Tarea (Bloqueado)</button>
-        `;
-      } else {
-        botonesHTML = `
-          <button class="btn-accion" onclick="alert('Función de subir archivo en desarrollo')">Subir / Reemplazar Archivo</button>
-          <button class="btn-accion" style="background: #ffc107; color: black;" onclick="alert('Función de editar tarea en desarrollo')">Editar Tarea</button>
-        `;
-      }
-    }
+  if (estaVencida) {
+    botonesHTML = `
+      <div class="seccion-detalle" style="background: #f8d7da; color: #721c24; border-color: #f5c6cb;">
+        <strong>⚠️ El plazo de entrega ha vencido.</strong>
+      </div>
+      <button class="btn-accion" style="background:#ffc107; color:black;" onclick='cerrarDetalle(); abrirModalEditar(${JSON.stringify(tarea)})'>
+        Editar tarea
+      </button>
+    `;
+  } else {
+    botonesHTML = `
+      <button class="btn-accion" onclick="alert('Función de subir archivo en desarrollo')">
+        Subir / Reemplazar Archivo
+      </button>
+      <button class="btn-accion" style="background:#ffc107; color:black;" onclick='cerrarDetalle(); abrirModalEditar(${JSON.stringify(tarea)})'>
+        Editar tarea
+      </button>
+    `;
+  }
+}
 
     // LÓGICA ROL ESTUDIANTE
     if (USUARIO.rol === "estudiante") {

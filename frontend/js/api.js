@@ -106,3 +106,15 @@ async function getComentariosMateria(materia_id) {
   const res = await fetch(`${API_URL}/comentarios/materia/${materia_id}`);
   return res.json();
 }
+
+async function putTarea(id, data) {
+  const res = await fetch(`${API_URL}/tareas/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+
+  return res.json();
+}

@@ -2,8 +2,8 @@ const contenedor = document.getElementById("tareas");
 
 // Simulación temporal
 const USUARIO = JSON.parse(localStorage.getItem("usuario")) || {
-  id: "96b507af-b5e3-47f8-be6d-9e727476d83d",
-  rol: "estudiante"
+  id: "46b15198-b5d4-4455-994e-12e0382db3c9",
+  rol: "docente"
 };
 
 // Ocultar formulario si no es docente
@@ -223,6 +223,52 @@ async function cambiarEstado(id, estado) {
   } catch (error) {
     console.error("Error cambiando estado:", error);
   }
+}
+
+//editar tarea
+let tareaEditando = null;
+
+function abrirModalEditar(tarea) {
+  tareaEditando = tarea;
+
+  document.getElementById("edit-titulo").value = tarea.titulo || "";
+  document.getElementById("edit-descripcion").value = tarea.descripcion || "";
+  document.getElementById("edit-fecha_entrega").value = tarea.fecha_entrega || "";
+  document.getElementById("edit-nota_maxima").value = tarea.nota_maxima ?? "";
+  document.getElementById("edit-instrucciones").value = tarea.instrucciones || "";
+
+  document.getElementById("modal-editar-tarea").style.display = "flex";
+}
+
+function cerrarModalEditar() {
+  tareaEditando = null;
+  document.getElementById("modal-editar-tarea").style.display = "none";
+}
+
+async function guardarEdicionTarea() {
+  if (!tareaEditando) return;
+
+  const body = {
+    docente_id: USUARIO.id,
+    titulo: document.getElementById("edit-titulo").value,
+    descripcion: document.getElementById("edit-descripcion").value,
+    fecha_entrega: document.getElementById("edit-fecha_entrega").value,
+    nota_maxima: document.getElementById("edit-nota_maxima").value
+      ? Number(document.getElementById("edit-nota_maxima").value)
+      : null,
+    instrucciones: document.getElementById("edit-instrucciones").value
+  };
+
+  const res = await putTarea(tareaEditando.id, body);
+
+  if (res.error) {
+    alert(res.error);
+    return;
+  }
+
+  cerrarModalEditar();
+  alert("Tarea actualizada correctamente");
+  cargarTareas();
 }
 
 // Inicial
