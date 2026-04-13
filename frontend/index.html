@@ -118,6 +118,23 @@
 
   <!-- Toast calificaciones -->
   <div id="toast-calificaciones" style="display:none; position:fixed; bottom:5rem; right:2rem; color:white; padding:1rem 1.5rem; border-radius:8px; z-index:200;"></div>
+  
+  <section id="modulo-organizacion-docente">
+  <h2>Organización de entregas</h2>
+
+  <select id="select-tarea-organizar">
+    <option value="">-- Selecciona una tarea --</option>
+  </select>
+
+  <select id="filtro-estado">
+    <option value="">-- Filtrar por estado --</option>
+    <option value="entregada">Entregada</option>
+    <option value="calificada">Calificada</option>
+  </select>
+
+  <div id="lista-organizada"></div>
+  </section>
+
 
   <!-- 🔥 IMPORTANTE: ORDEN -->
   <script src="./js/api.js"></script>
@@ -127,6 +144,7 @@
   <script src="./js/organizacion.js"></script>
   <script src="./js/entregas.js"></script>
   <script src="./js/calificaciones.js"></script>
+  <script src="./js/organizacionDocente.js"></script>
 
 </body>
 </html>
