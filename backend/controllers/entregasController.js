@@ -120,7 +120,7 @@ const obtenerEntregasPorEstudiante = async (req, res) => {
 
     const { data, error } = await supabase
       .from("entregas")
-      .select("id,tarea_id,contenido,fecha_entrega,estado,calificacion,retroalimentacion,tareas(id, titulo, fecha_entrega, materia_id)")
+      .select("id,tarea_id,contenido,fecha_entrega,estado,calificacion,retroalimentacion,tareas(id, titulo, fecha_entrega, materia_id,materias(id,nombre,codigo))")
       .eq("estudiante_id", estudiante_id)
       .order("fecha_entrega", { ascending: false });
 

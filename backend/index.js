@@ -5,8 +5,6 @@ const inscripcionesRoutes = require('./routes/inscripciones')
 const organizacionRoutes = require('./routes/organizacion')
 const entregasRoutes = require('./routes/entregas')
 
-const entregasRoutes = require('./routes/entregas')
-
 const app = express();
 
 
