@@ -1,0 +1,117 @@
+const usuarioActual = JSON.parse(localStorage.getItem("usuario")) || {
+  id: "96b507af-b5e3-47f8-be6d-9e727476d83d",
+  rol: "estudiante"
+};
+
+function mostrarToast(mensaje, color = "#323232") {
+  const toast = document.getElementById("toast-entregas");
+  if (!toast) return;
+
+  toast.textContent = mensaje;
+  toast.style.background = color;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
+
+async function handleEliminarEntrega(entrega_id) {
+  if (!confirm("¿Seguro que quieres eliminar tu entrega?")) return;
+
+  const res = await eliminarEntrega(entrega_id, usuarioActual.id);
+
+  if (res.error) {
+    mostrarToast(`Error: ${res.error}`, "#e53935");
+    return;
+  }
+
+  mostrarToast("Entrega eliminada.", "#F57F17");
+
+  setTimeout(() => {
+    cargarMisEntregas();
+  }, 1000);
+}
+
+function renderizarMisEntregas(misEntregas) {
+  const contenedor = document.getElementById("lista-entregas");
+  if (!contenedor) return;
+
+  contenedor.innerHTML = "";
+
+  if (!misEntregas.length) {
+    contenedor.innerHTML = "<p>Aún no realizaste entregas.</p>";
+    return;
+  }
+
+  misEntregas.forEach((entrega) => {
+    const tarea = entrega.tareas || {};
+    const estado = entrega.estado || "pendiente";
+
+    const card = document.createElement("div");
+    card.className = "entrega-card";
+
+    card.innerHTML = `
+      <div class="entrega-card-header">
+        <h3>${tarea.titulo || "Tarea"}</h3>
+        <span class="badge badge-${estado}">
+          ${estado.charAt(0).toUpperCase() + estado.slice(1)}
+        </span>
+      </div>
+
+      <p><strong>Contenido:</strong> ${entrega.contenido || "-"}</p>
+
+      <p><strong>Fecha de entrega:</strong> ${
+        entrega.fecha_entrega
+          ? new Date(entrega.fecha_entrega).toLocaleDateString()
+          : "Sin fecha"
+      }</p>
+
+      <p><strong>Materia:</strong> ${tarea.materias?.nombre || "Sin materia"}</p>
+      <p><strong>Grupo:</strong> ${tarea.grupo || "-"}</p>
+
+      ${
+        entrega.calificacion != null
+          ? `<p><strong>Nota:</strong> ${entrega.calificacion}/100</p>`
+          : ""
+      }
+
+      ${
+        entrega.retroalimentacion
+          ? `<p><strong>Retroalimentación:</strong> ${entrega.retroalimentacion}</p>`
+          : ""
+      }
+
+      <div class="entrega-acciones">
+        ${
+          estado !== "calificada"
+            ? `<button class="btn-eliminar-entrega" onclick="handleEliminarEntrega('${entrega.id}')">Eliminar entrega</button>`
+            : ""
+        }
+      </div>
+    `;
+
+    contenedor.appendChild(card);
+  });
+}
+
+async function cargarMisEntregas() {
+  try {
+    const misEntregas = await obtenerMisEntregas(usuarioActual.id);
+
+    if (!Array.isArray(misEntregas)) {
+      mostrarToast("Error cargando entregas.", "#e53935");
+      return;
+    }
+
+    renderizarMisEntregas(misEntregas);
+  } catch (error) {
+    console.error("Error cargando entregas:", error);
+    mostrarToast("Error cargando entregas.", "#e53935");
+  }
+}
+
+// Solo carga si existe el contenedor
+if (document.getElementById("lista-entregas")) {
+  cargarMisEntregas();
+}

@@ -1,51 +1,161 @@
 const contenedor = document.getElementById("tareas");
 
 // Simulación temporal
-const USUARIO = {
-  id: "TU_ID_REAL",
-  rol: "docente"
+const USUARIO = JSON.parse(localStorage.getItem("usuario")) || {
+  id: "96b507af-b5e3-47f8-be6d-9e727476d83d",
+  rol: "estudiante"
 };
 
 // Ocultar formulario si no es docente
 if (USUARIO.rol !== "docente") {
-  document.querySelector("#form-crear").style.display = "none";
+  const formCrear = document.querySelector("#form-crear");
+  if (formCrear) formCrear.style.display = "none";
 }
 
-// Cargar tareas
+// Modal simple para entregar tarea
+let tareaSeleccionada = null;
+
+function mostrarToast(mensaje) {
+  alert(mensaje);
+}
+
+function abrirModalEntrega(tarea) {
+  tareaSeleccionada = tarea;
+
+  const modalExistente = document.getElementById("modal-entrega");
+  if (modalExistente) {
+    modalExistente.style.display = "flex";
+    document.getElementById("modal-titulo-tarea").textContent = tarea.titulo;
+    document.getElementById("input-contenido-entrega").value = "";
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.id = "modal-entrega";
+  modal.className = "modal-overlay";
+  modal.innerHTML = `
+    <div class="modal-content">
+      <button class="btn-cerrar" onclick="cerrarModalEntrega()">X Cerrar</button>
+      <h2 id="modal-titulo-tarea">${tarea.titulo}</h2>
+      <textarea id="input-contenido-entrega" rows="6" placeholder="Escribe tu entrega aquí..."></textarea>
+      <br><br>
+      <button class="btn-accion" onclick="confirmarEntregaDesdeTareas()">Enviar entrega</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function cerrarModalEntrega() {
+  const modal = document.getElementById("modal-entrega");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+async function confirmarEntregaDesdeTareas() {
+  const input = document.getElementById("input-contenido-entrega");
+  const contenido = input?.value.trim();
+
+  if (!contenido) {
+    mostrarToast("Escribe algo antes de enviar.");
+    return;
+  }
+
+  const res = await entregarTarea(
+    tareaSeleccionada.id,
+    USUARIO.id,
+    contenido
+  );
+
+  if (res.error) {
+    mostrarToast(res.error);
+    return;
+  }
+
+  cerrarModalEntrega();
+  mostrarToast("Tarea entregada correctamente.");
+  cargarTareas();
+}
+
+// Cargar tareas según rol
 async function cargarTareas() {
   try {
     const tareas = await getTareas();
-
     contenedor.innerHTML = "";
 
-    tareas.forEach((t) => {
+    let tareasAMostrar = tareas;
+
+    // Si es estudiante, solo ve tareas de materias inscritas
+    if (USUARIO.rol === "estudiante") {
+      const inscripciones = await getInscripciones(USUARIO.id);
+
+      const materiasInscritas = inscripciones
+        .map((ins) => ins.materias?.id)
+        .filter(Boolean);
+
+      tareasAMostrar = tareas.filter((t) =>
+        materiasInscritas.includes(t.materia_id)
+      );
+    }
+
+    if (!tareasAMostrar.length) {
+      contenedor.innerHTML = "<p>No hay tareas disponibles.</p>";
+      return;
+    }
+
+    let misEntregas = [];
+    if (USUARIO.rol === "estudiante") {
+      misEntregas = await obtenerMisEntregas(USUARIO.id);
+    }
+
+    tareasAMostrar.forEach((t) => {
       const div = document.createElement("div");
       div.className = "card-tarea";
 
       const estadoTexto = t.estado || "pendiente";
+      const miEntrega = USUARIO.rol === "estudiante"
+        ? misEntregas.find((e) => e.tarea_id === t.id)
+        : null;
 
       div.innerHTML = `
         <h3>${t.titulo}</h3>
         <p>${t.descripcion || ""}</p>
-        <p><strong>Instrucciones:</strong> ${t.instrucciones || "Sin instrucciones"}</p>
-        <p><strong>Nota máxima:</strong> ${t.nota_maxima ?? "-"}</p>
+        <p><strong>Materia:</strong> ${t.materias?.nombre || "Sin materia"}</p>
         <p><strong>Grupo:</strong> ${t.grupo || "-"}</p>
-        <p><strong>Fecha:</strong> ${t.fecha_entrega || "Sin fecha"}</p>
+        <p><strong>Nota máxima:</strong> ${t.nota_maxima ?? "-"}</p>
         <p><strong>Creador:</strong> ${t.usuarios?.nombre || "Desconocido"}</p>
-        <p><strong>Estado:</strong> 
+        <p><strong>Estado:</strong>
           <span class="estado-badge estado-${estadoTexto}">
             ${estadoTexto}
           </span>
         </p>
 
-        <div class="acciones-estado">
-          <button onclick="cambiarEstado('${t.id}', 'pendiente')">Pendiente</button>
-          <button onclick="cambiarEstado('${t.id}', 'en_progreso')">En progreso</button>
-          <button onclick="cambiarEstado('${t.id}', 'completada')">Completada</button>
-        </div>
+        ${
+          USUARIO.rol === "docente"
+            ? `
+              <div class="acciones-estado">
+                <button onclick="cambiarEstado('${t.id}', 'pendiente')">Pendiente</button>
+                <button onclick="cambiarEstado('${t.id}', 'en_progreso')">En progreso</button>
+                <button onclick="cambiarEstado('${t.id}', 'completada')">Completada</button>
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          USUARIO.rol === "estudiante"
+            ? `
+              <p><strong>Mi entrega:</strong> ${miEntrega ? "Ya entregada" : "Pendiente"}</p>
+              ${
+                !miEntrega
+                  ? `<button class="btn-entregar" onclick='abrirModalEntrega(${JSON.stringify(t)})'>Entregar tarea</button>`
+                  : ""
+              }
+            `
+            : ""
+        }
 
         <button class="btn-ver-detalles" onclick="abrirDetalle('${t.id}')">Ver Detalles Completos</button>
-
         <hr>
       `;
 
