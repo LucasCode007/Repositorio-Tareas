@@ -13,8 +13,6 @@ app.use(express.json());
 app.use("/api/organizacion", organizacionRoutes);
 app.use("/api/entregas", entregasRoutes);
 
-app.use("/api/entregas", entregasRoutes);
-
 const usuariosRoutes = require("./routes/usuarios");
 const tareasRoutes = require("./routes/tareas");
 const materiasRoutes = require('./routes/materias')

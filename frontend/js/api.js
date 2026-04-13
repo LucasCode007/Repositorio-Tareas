@@ -82,3 +82,14 @@ async function eliminarEntrega(entrega_id, estudiante_id) {
   });
   return res.json();
 }
+
+// ─── US5: Calificaciones ──────────────────────────────────
+
+async function calificarEntrega(entrega_id, docente_id, calificacion, retroalimentacion) {
+  const res = await fetch(`${API_URL}/entregas/${entrega_id}/calificar`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ docente_id, calificacion, retroalimentacion })
+  });
+  return res.json();
+}
