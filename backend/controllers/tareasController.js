@@ -108,9 +108,90 @@ const cambiarEstadoTarea = async (req, res) => {
   }
 };
 
+//editar tarea (solo docente) 
+
+const updateTarea = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      titulo,
+      descripcion,
+      fecha_entrega,
+      nota_maxima,
+      instrucciones,
+      docente_id
+    } = req.body;
+
+    if (!docente_id) {
+      return res.status(400).json({ error: "docente_id es obligatorio." });
+    }
+
+    // validar usuario
+    const { data: usuario, error: errorUsuario } = await supabase
+      .from("usuarios")
+      .select("id, rol")
+      .eq("id", docente_id)
+      .single();
+
+    if (errorUsuario || !usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado." });
+    }
+
+    if (usuario.rol !== "docente") {
+      return res.status(403).json({
+        error: "Solo los docentes pueden editar tareas."
+      });
+    }
+
+    // verificar que la tarea exista
+    const { data: tareaExistente, error: errorTarea } = await supabase
+      .from("tareas")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (errorTarea || !tareaExistente) {
+      return res.status(404).json({ error: "Tarea no encontrada." });
+    }
+
+    const camposActualizar = {};
+
+    if (titulo !== undefined) camposActualizar.titulo = titulo;
+    if (descripcion !== undefined) camposActualizar.descripcion = descripcion;
+    if (fecha_entrega !== undefined) camposActualizar.fecha_entrega = fecha_entrega;
+    if (nota_maxima !== undefined) camposActualizar.nota_maxima = nota_maxima;
+    if (instrucciones !== undefined) camposActualizar.instrucciones = instrucciones;
+
+    if (Object.keys(camposActualizar).length === 0) {
+      return res.status(400).json({
+        error: "No hay campos para actualizar."
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("tareas")
+      .update(camposActualizar)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.json({
+      mensaje: "Tarea actualizada correctamente.",
+      tarea: data
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 
 module.exports = {
   crearTarea,
   obtenerTareas,
-  cambiarEstadoTarea
+  cambiarEstadoTarea,
+  updateTarea
 };
