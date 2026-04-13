@@ -83,11 +83,11 @@ function renderizarMisEntregas(misEntregas) {
       }
 
       <div class="entrega-acciones">
-        ${
-          estado !== "calificada"
-            ? `<button class="btn-eliminar-entrega" onclick="handleEliminarEntrega('${entrega.id}')">Eliminar entrega</button>`
-            : ""
-        }
+        ${!entrega ? `<button class="btn-entregar" onclick='abrirModalEntrega(${JSON.stringify(tarea)})'>Entregar</button>` : ''}
+        ${entrega && estado !== 'calificada' ? `
+       <button class="btn-eliminar-entrega" onclick="handleEliminarEntrega('${entrega.id}')">Eliminar</button>
+       <button class="btn-reemplazar" onclick="abrirModalReemplazar('${entrega.id}')">Reemplazar</button>
+       ` : ''}
       </div>
     `;
 
@@ -114,4 +114,35 @@ async function cargarMisEntregas() {
 // Solo carga si existe el contenedor
 if (document.getElementById("lista-entregas")) {
   cargarMisEntregas();
+}
+
+let entregaAReemplazar = null;
+
+function abrirModalReemplazar(entrega_id) {
+  entregaAReemplazar = entrega_id;
+  document.getElementById('input-contenido-reemplazar').value = '';
+  document.getElementById('modal-reemplazar').style.display = 'flex';
+}
+
+function cerrarModalReemplazar() {
+  entregaAReemplazar = null;
+  document.getElementById('modal-reemplazar').style.display = 'none';
+}
+
+async function confirmarReemplazo() {
+  const contenido = document.getElementById('input-contenido-reemplazar').value.trim();
+  if (!contenido) {
+    mostrarToast('Escribe algo antes de enviar.', '#e53935');
+    return;
+  }
+
+  const res = await reemplazarEntrega(entregaAReemplazar, usuarioActual.id, contenido);
+
+  if (res.error) {
+    mostrarToast(`Error: ${res.error}`, '#e53935');
+  } else {
+    cerrarModalReemplazar();
+    mostrarToast('Entrega reemplazada correctamente.', '#1565C0');
+    setTimeout(() => cargarMisEntregas(), 1000);
+  }
 }
