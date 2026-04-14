@@ -1,10 +1,23 @@
-const contenedor = document.getElementById("tareas");
-
-// Simulación temporal
 const USUARIO = JSON.parse(localStorage.getItem("usuario")) || {
   id: "46b15198-b5d4-4455-994e-12e0382db3c9",
   rol: "docente"
 };
+
+const contenedor = document.getElementById("tareas");
+if (!localStorage.getItem('usuario')) {
+  window.location.href = './login.html';
+}
+
+const bienvenida = document.getElementById('bienvenida');
+if (bienvenida) {
+  bienvenida.textContent = `Rol: ${USUARIO.rol}`;
+}
+
+// Cerrar sesión
+function cerrarSesion() {
+  localStorage.removeItem('usuario');
+  window.location.href = './login.html';
+}
 
 // Ocultar formulario si no es docente
 if (USUARIO.rol !== "docente") {
