@@ -1,4 +1,3 @@
-
 let comentarioPadreTarea = null; // Variable para saber si estamos respondiendo
 
 async function abrirDetalle(id) {

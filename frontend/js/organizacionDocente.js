@@ -1,13 +1,9 @@
-const USUARIO_ORG = JSON.parse(localStorage.getItem("usuario")) || {
-  id: "46b15198-b5d4-4455-994e-12e0382db3c9",
-  rol: "docente"
-};
 
 // Ocultar módulo si no es docente
 document.addEventListener("DOMContentLoaded", () => {
   const seccion = document.getElementById("modulo-organizacion-docente");
 
-  if (USUARIO_ORG.rol !== "docente") {
+  if (USUARIO.rol !== "docente") {
     if (seccion) seccion.style.display = "none";
     return;
   }
@@ -42,7 +38,7 @@ async function cargarEntregasOrganizadas() {
 
   if (!tarea_id) return;
 
-  let entregas = await obtenerEntregasDeTarea(tarea_id, USUARIO_ORG.id);
+  let entregas = await obtenerEntregasDeTarea(tarea_id, USUARIO.id);
 
   if (entregas.error) {
     console.error(entregas.error);

@@ -1,7 +1,3 @@
-const usuarioActual = JSON.parse(localStorage.getItem("usuario")) || {
-  id: "d097a79b-e0af-43a9-86f8-ffbb3576f793",
-  rol: "estudiante"
-};
 
 function mostrarToast(mensaje, color = "#323232") {
   const toast = document.getElementById("toast-entregas");
@@ -19,7 +15,7 @@ function mostrarToast(mensaje, color = "#323232") {
 async function handleEliminarEntrega(entrega_id) {
   if (!confirm("¿Seguro que quieres eliminar tu entrega?")) return;
 
-  const res = await eliminarEntrega(entrega_id, usuarioActual.id);
+  const res = await eliminarEntrega(entrega_id, USUARIO.id);
 
   if (res.error) {
     mostrarToast(`Error: ${res.error}`, "#e53935");
@@ -97,7 +93,7 @@ function renderizarMisEntregas(misEntregas) {
 
 async function cargarMisEntregas() {
   try {
-    const misEntregas = await obtenerMisEntregas(usuarioActual.id);
+    const misEntregas = await obtenerMisEntregas(USUARIO.id);
 
     if (!Array.isArray(misEntregas)) {
       mostrarToast("Error cargando entregas.", "#e53935");
@@ -136,7 +132,7 @@ async function confirmarReemplazo() {
     return;
   }
 
-  const res = await reemplazarEntrega(entregaAReemplazar, usuarioActual.id, contenido);
+  const res = await reemplazarEntrega(entregaAReemplazar, USUARIO.id, contenido);
 
   if (res.error) {
     mostrarToast(`Error: ${res.error}`, '#e53935');

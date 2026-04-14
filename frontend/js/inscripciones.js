@@ -1,10 +1,6 @@
 const contenedorMaterias = document.getElementById("lista-materias");
 const contenedorInscripciones = document.getElementById("lista-inscripciones");
 
-const USUARIO_INSCRIPCION = {
-  id: "d097a79b-e0af-43a9-86f8-ffbb3576f793",
-  rol: "estudiante"
-};
 
 async function cargarMaterias() {
   try {
@@ -35,7 +31,7 @@ async function cargarMaterias() {
 
 async function cargarInscripciones() {
   try {
-    const inscripciones = await getInscripciones(USUARIO_INSCRIPCION.id);
+    const inscripciones = await getInscripciones(USUARIO.id);
     contenedorInscripciones.innerHTML = "";
 
     if (!inscripciones.length) {
@@ -70,7 +66,7 @@ async function cargarInscripciones() {
 
 async function inscribirme(materiaId) {
   try {
-    const inscripciones = await getInscripciones(USUARIO_INSCRIPCION.id);
+    const inscripciones = await getInscripciones(USUARIO.id);
 
     const yaInscrito = inscripciones.some(i => i.materias?.id === materiaId);
 
@@ -80,7 +76,7 @@ async function inscribirme(materiaId) {
     }
 
     const res = await crearInscripcion({
-      usuario_id: USUARIO_INSCRIPCION.id,
+      usuario_id: USUARIO.id,
       materia_id: materiaId
     });
 

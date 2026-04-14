@@ -105,7 +105,7 @@ async function enviarComentarioMuro(materia_id) {
   if (!contenido) return;
 
   try {
-    const idUsuario = USUARIO_INSCRIPCION.id; 
+    const idUsuario = USUARIO.id; 
 
     const res = await postComentario({
       contenido,

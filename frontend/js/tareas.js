@@ -1,11 +1,5 @@
 const contenedor = document.getElementById("tareas");
 
-// Simulación temporal
-const USUARIO = JSON.parse(localStorage.getItem("usuario")) || {
-  id: "46b15198-b5d4-4455-994e-12e0382db3c9",
-  rol: "docente"
-};
-
 // Ocultar formulario si no es docente
 if (USUARIO.rol !== "docente") {
   const formCrear = document.querySelector("#form-crear");
@@ -175,9 +169,10 @@ async function crearTarea() {
     const instrucciones = document.getElementById("instrucciones").value;
     const nota_maxima = document.getElementById("nota_maxima").value;
     const grupo = document.getElementById("grupo").value;
+    const materia_id = document.getElementById("materia_id").value;
 
-    if (!titulo) {
-      alert("El título es obligatorio");
+    if (!titulo || !materia_id) {
+      alert("El título y la materia son obligatorios");
       return;
     }
 
@@ -188,7 +183,8 @@ async function crearTarea() {
       creador_id: USUARIO.id,
       instrucciones,
       nota_maxima: nota_maxima ? Number(nota_maxima) : null,
-      grupo
+      grupo,
+      materia_id
     });
 
     if (res.error) {
@@ -202,12 +198,30 @@ async function crearTarea() {
     document.getElementById("instrucciones").value = "";
     document.getElementById("nota_maxima").value = "";
     document.getElementById("grupo").value = "";
+    document.getElementById("materia_id").value = "";
 
     cargarTareas();
   } catch (error) {
     console.error("Error creando tarea:", error);
   }
 }
+
+async function cargarMateriasEnFormulario() {
+  const select = document.getElementById("materia_id");
+  if (!select) return;
+
+  const materias = await getMaterias();
+
+  select.innerHTML = '<option value="">-- Selecciona una materia --</option>';
+
+  materias.forEach((m) => {
+    const option = document.createElement("option");
+    option.value = m.id;
+    option.textContent = `${m.nombre}${m.codigo ? ` (${m.codigo})` : ""}`;
+    select.appendChild(option);
+  });
+}
+
 
 // Cambiar estado
 async function cambiarEstado(id, estado) {
@@ -273,3 +287,4 @@ async function guardarEdicionTarea() {
 
 // Inicial
 cargarTareas();
+cargarMateriasEnFormulario();

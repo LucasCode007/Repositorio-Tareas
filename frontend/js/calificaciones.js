@@ -1,14 +1,7 @@
-// Usuario simulado — igual que en otros módulos
-const USUARIO_CAL = JSON.parse(localStorage.getItem("usuario")) || {
-  id: "46b15198-b5d4-4455-994e-12e0382db3c9",
-  rol: "docente",
-  nombre: "Docente"
-};
-
 // Ocultar módulo si no es docente
 document.addEventListener("DOMContentLoaded", () => {
   const seccion = document.getElementById("modulo-calificaciones");
-  if (USUARIO_CAL.rol !== "docente" && seccion) {
+  if (USUARIO.rol !== "docente" && seccion) {
     seccion.style.display = "none";
     return;
   }
@@ -75,7 +68,7 @@ async function confirmarCalificacion() {
 
   const res = await calificarEntrega(
     entregaSeleccionada.id,
-    USUARIO_CAL.id,
+    USUARIO.id,
     nota,
     retroalimentacion
   );
@@ -151,7 +144,7 @@ async function cargarEntregasPorTarea() {
     return;
   }
 
-  const entregas = await obtenerEntregasDeTarea(tarea_id, USUARIO_CAL.id);
+  const entregas = await obtenerEntregasDeTarea(tarea_id, USUARIO.id);
 
   if (entregas.error) {
     mostrarToastCal(`Error: ${entregas.error}`, "#e53935");

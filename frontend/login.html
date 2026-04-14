@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Repositorio de Tareas — Iniciar sesión</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f0f4ff;
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    .login-container {
+      background: white;
+      padding: 3rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 420px;
+    }
+
+    h1 { color: #0f3460; margin-bottom: 0.5rem; }
+    p  { color: #666; margin-bottom: 1.5rem; }
+
+    .roles {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .btn-rol {
+      flex: 1;
+      padding: 1rem;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      opacity: 0.5;
+    }
+
+    .btn-rol.activo {
+      opacity: 1;
+      border-color: currentColor;
+    }
+
+    .btn-docente   { background: #0f3460; color: white; }
+    .btn-estudiante { background: #e94560; color: white; }
+
+    .campo-id {
+      margin-top: 1rem;
+    }
+
+    .campo-id input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      margin-bottom: 1rem;
+    }
+
+    .btn-entrar {
+      width: 100%;
+      padding: 0.9rem;
+      background: #0f3460;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-entrar:hover { opacity: 0.85; }
+
+    .error {
+      color: #e94560;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h1>Repositorio de Tareas</h1>
+    <p>Selecciona tu rol e ingresa tu ID</p>
+
+    <div class="roles">
+      <button class="btn-rol btn-docente" id="btn-docente" onclick="seleccionarRol('docente')">
+        👨‍🏫 Docente
+      </button>
+      <button class="btn-rol btn-estudiante" id="btn-estudiante" onclick="seleccionarRol('estudiante')">
+        👨‍🎓 Estudiante
+      </button>
+    </div>
+
+    <hr style="margin-bottom: 1.5rem; border-color: #eee;">
+
+    <div class="campo-id">
+      <input type="text" id="input-id" placeholder="Pega tu ID de usuario aquí..." />
+      <button class="btn-entrar" onclick="entrar()">Entrar</button>
+      <p class="error" id="error-msg">Por favor selecciona un rol e ingresa tu ID.</p>
+    </div>
+  </div>
+
+  <script>
+    let rolSeleccionado = null;
+
+    function seleccionarRol(rol) {
+      rolSeleccionado = rol;
+      document.getElementById('btn-docente').classList.toggle('activo', rol === 'docente');
+      document.getElementById('btn-estudiante').classList.toggle('activo', rol === 'estudiante');
+    }
+
+    function entrar() {
+      const id = document.getElementById('input-id').value.trim();
+      const error = document.getElementById('error-msg');
+
+      if (!rolSeleccionado || !id) {
+        error.style.display = 'block';
+        error.textContent = !rolSeleccionado
+          ? 'Selecciona un rol primero.'
+          : 'Ingresa tu ID de usuario.';
+        return;
+      }
+
+      error.style.display = 'none';
+
+      const usuario = { id, rol: rolSeleccionado };
+      localStorage.setItem('usuario', JSON.stringify(usuario));
+      window.location.href = './index.html';
+    }
+
+    // Si ya hay sesión, redirigir directo
+    if (localStorage.getItem('usuario')) {
+      window.location.href = './index.html';
+    }
+  </script>
+
+</body>
+</html>

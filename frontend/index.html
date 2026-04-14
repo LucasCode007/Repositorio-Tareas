@@ -10,7 +10,7 @@
 <body>
 
   <h1>Repositorio de Tareas</h1>
-
+  <button onclick="cerrarSesion()">Cerrar sesión</button>
   <!-- Crear tarea -->
   <section id="form-crear">
     <h2>Crear Tarea</h2>
@@ -21,6 +21,9 @@
     <input type="text" id="instrucciones" placeholder="Instrucciones">
     <input type="number" id="nota_maxima" placeholder="Nota máxima">
     <input type="text" id="grupo" placeholder="Grupo">
+    <select id="materia_id">
+      <option value="">-- Selecciona una materia --</option>
+    </select>
 
     <button onclick="crearTarea()">Crear</button>
   </section>
@@ -175,6 +178,7 @@
 
 
   <!--IMPORTANTE: ORDEN -->
+<script src="./js/usuario.js"></script>
 <script src="./js/api.js"></script>
   <script src="./js/tareas.js"></script>
   <script src="./js/detalles.js"></script>

@@ -3,7 +3,7 @@ const supabase = require("../db");
 
 const crearTarea = async (req, res) => {
   try {
-    const { titulo, descripcion, fecha_entrega, creador_id,instrucciones,nota_maxima,grupo} = req.body;
+    const { titulo, descripcion, fecha_entrega, creador_id,instrucciones,nota_maxima,grupo, materia_id} = req.body;
 
     if (!titulo || !creador_id) {
       return res.status(400).json({
@@ -40,7 +40,8 @@ const crearTarea = async (req, res) => {
           creador_id,
           instrucciones,
           nota_maxima,
-          grupo
+          grupo,
+          materia_id
         },
       ])
       .select();
