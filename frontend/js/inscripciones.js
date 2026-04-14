@@ -1,7 +1,7 @@
 const contenedorMaterias = document.getElementById("lista-materias");
 const contenedorInscripciones = document.getElementById("lista-inscripciones");
 
-const USUARIO_INSCRIPCION = {
+const USUARIO_INSCRIPCION = JSON.parse(localStorage.getItem("usuario")) || {
   id: "d097a79b-e0af-43a9-86f8-ffbb3576f793",
   rol: "estudiante"
 };
@@ -109,6 +109,35 @@ async function borrarInscripcion(id) {
     cargarInscripciones();
   } catch (error) {
     console.error("Error eliminando inscripción:", error);
+  }
+}
+
+async function inscribirme(materiaId) {
+  try {
+    const inscripciones = await getInscripciones(USUARIO_INSCRIPCION.id);
+
+    const yaInscrito = inscripciones.some(i => i.materias?.id === materiaId);
+
+    if (yaInscrito) {
+      alert("Ya estás inscrito en esta materia");
+      return;
+    }
+
+    const res = await crearInscripcion({
+      usuario_id: USUARIO_INSCRIPCION.id,
+      materia_id: materiaId
+    });
+
+    if (res.error) {
+      alert(res.error);
+      return;
+    }
+
+    cargarMaterias();
+    cargarInscripciones();
+    cargarTareas(); // ← agregar esto
+  } catch (error) {
+    console.error("Error creando inscripción:", error);
   }
 }
 
