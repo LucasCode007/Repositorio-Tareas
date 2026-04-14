@@ -1,6 +1,6 @@
-// Abrir el muro de la materia como un modal
+let comentarioPadreMuro = null; // Variable para saber a quién respondemos en el muro
+
 async function abrirMuroMateria(materia_id, materia_nombre) {
-  // Reutilizamos la estructura oscura del modal que creaste en modal.css
   const modalOverlay = document.createElement("div");
   modalOverlay.className = "modal-overlay";
   modalOverlay.id = "ventana-muro";
@@ -16,6 +16,11 @@ async function abrirMuroMateria(materia_id, materia_nombre) {
           <p style="color: gray; font-size: 0.9em; text-align: center;">Cargando comentarios...</p>
         </div>
         
+        <div id="indicador-respuesta-muro" class="indicador-respuesta" style="display: none;">
+          <span id="texto-respuesta-muro"></span>
+          <button onclick="cancelarRespuestaMuro()" style="background: none; border: none; color: #721c24; cursor: pointer; font-weight: bold; font-size: 1.2em;">✖</button>
+        </div>
+
         <div class="caja-escribir-comentario">
           <input type="text" id="input-comentario-muro" placeholder="Escribe un anuncio o pregunta para la clase...">
           <button class="btn-enviar-comentario" onclick="enviarComentarioMuro('${materia_id}')">Publicar</button>
@@ -24,12 +29,29 @@ async function abrirMuroMateria(materia_id, materia_nombre) {
     </div>
   `;
   document.body.appendChild(modalOverlay);
-  
-  // Cargar los comentarios al abrir
   cargarComentariosMuro(materia_id);
 }
 
-// Cargar la lista de comentarios del muro
+function cerrarMuro() {
+  comentarioPadreMuro = null;
+  const modal = document.getElementById("ventana-muro");
+  if (modal) modal.remove();
+}
+
+//Funciones de respuesta para el muro
+function prepararRespuestaMuro(idComentario, nombreUsuario) {
+  comentarioPadreMuro = idComentario;
+  document.getElementById("texto-respuesta-muro").textContent = `Respondiendo a ${nombreUsuario}`;
+  document.getElementById("indicador-respuesta-muro").style.display = "flex";
+  document.getElementById("input-comentario-muro").focus();
+}
+
+function cancelarRespuestaMuro() {
+  comentarioPadreMuro = null;
+  document.getElementById("indicador-respuesta-muro").style.display = "none";
+}
+
+//Cargar y agrupar comentarios del muro
 async function cargarComentariosMuro(materia_id) {
   const contenedor = document.getElementById("lista-comentarios-muro");
   if (!contenedor) return;
@@ -43,25 +65,39 @@ async function cargarComentariosMuro(materia_id) {
       return;
     }
 
-    comentarios.forEach(c => {
+    const padres = comentarios.filter(c => !c.comentario_padre_id);
+    const hijos = comentarios.filter(c => c.comentario_padre_id);
+
+    const dibujarComentarioMuro = (c, esHijo) => {
       const div = document.createElement("div");
-      div.className = "comentario-item";
+      div.className = esHijo ? "comentario-item comentario-respuesta" : "comentario-item";
       const hora = new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const nombreUsuario = c.usuarios?.nombre || "Usuario";
+
       div.innerHTML = `
-        <span class="comentario-autor">${c.usuarios?.nombre || "Usuario"} <span style="color: gray; font-weight: normal; font-size: 0.8em;">• ${hora}</span></span>
+        <span class="comentario-autor">${nombreUsuario} <span style="color: gray; font-weight: normal; font-size: 0.8em;">• ${hora}</span></span>
         <span>${c.contenido}</span>
+        ${!esHijo ? `<button class="btn-responder" onclick="prepararRespuestaMuro('${c.id}', '${nombreUsuario}')">Responder</button>` : ''}
       `;
-      contenedor.appendChild(div);
+      return div;
+    };
+
+    padres.forEach(padre => {
+      contenedor.appendChild(dibujarComentarioMuro(padre, false));
+      
+      const susHijos = hijos.filter(h => h.comentario_padre_id === padre.id);
+      susHijos.forEach(hijo => {
+        contenedor.appendChild(dibujarComentarioMuro(hijo, true));
+      });
     });
     
-    // Auto-scroll
     contenedor.scrollTop = contenedor.scrollHeight;
   } catch (error) {
     contenedor.innerHTML = '<p style="color: red;">Error al cargar el muro.</p>';
   }
 }
 
-// Publicar un nuevo comentario en la materia
+//Publicar comentario en el muro
 async function enviarComentarioMuro(materia_id) {
   const input = document.getElementById("input-comentario-muro");
   const contenido = input.value.trim();
@@ -69,14 +105,13 @@ async function enviarComentarioMuro(materia_id) {
   if (!contenido) return;
 
   try {
-    // Tomamos el usuario simulado que está definido en inscripciones.js
     const idUsuario = USUARIO_INSCRIPCION.id; 
 
-    // Ojo aquí: mandamos materia_id, pero NO enviamos tarea_id
     const res = await postComentario({
       contenido,
       materia_id: materia_id,
-      usuario_id: idUsuario
+      usuario_id: idUsuario,
+      comentario_padre_id: comentarioPadreMuro // Se manda el padre
     });
 
     if (res.error) {
@@ -85,14 +120,9 @@ async function enviarComentarioMuro(materia_id) {
     }
 
     input.value = "";
+    cancelarRespuestaMuro(); // Limpiamos el indicador
     cargarComentariosMuro(materia_id);
   } catch (error) {
     console.error("Error publicando en el muro:", error);
   }
-}
-
-// Cerrar el modal del muro
-function cerrarMuro() {
-  const modal = document.getElementById("ventana-muro");
-  if (modal) modal.remove();
 }

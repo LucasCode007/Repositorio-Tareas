@@ -1,4 +1,5 @@
-// 🔥 ARCHIVO FUSIONADO: detalles.js (Entregas de tus compañeros + Tus Comentarios)
+
+let comentarioPadreTarea = null; // Variable para saber si estamos respondiendo
 
 async function abrirDetalle(id) {
   try {
@@ -20,7 +21,7 @@ async function abrirDetalle(id) {
 
     let botonesHTML = "";
 
-    // LÓGICA DE TUS COMPAÑEROS (Rol Docente)
+    // LÓGICA ROL DOCENTE
     if (USUARIO.rol === "docente") {
       if (estaVencida) {
         botonesHTML = `
@@ -38,7 +39,7 @@ async function abrirDetalle(id) {
       }
     }
 
-    // LÓGICA DE TUS COMPAÑEROS (Rol Estudiante)
+    // LÓGICA ROL ESTUDIANTE
     if (USUARIO.rol === "estudiante") {
       botonesHTML = estaVencida
         ? `
@@ -53,7 +54,6 @@ async function abrirDetalle(id) {
         `;
     }
 
-    // ESTRUCTURA MODAL (Fusionada)
     modalOverlay.innerHTML = `
       <div class="modal-content">
         <button class="btn-cerrar" onclick="cerrarDetalle()">X Cerrar</button>
@@ -87,6 +87,11 @@ async function abrirDetalle(id) {
             <p style="color: gray; font-size: 0.9em; text-align: center;">Cargando comentarios...</p>
           </div>
           
+          <div id="indicador-respuesta-tarea" class="indicador-respuesta" style="display: none;">
+            <span id="texto-respuesta-tarea"></span>
+            <button onclick="cancelarRespuestaTarea()" style="background: none; border: none; color: #721c24; cursor: pointer; font-weight: bold; font-size: 1.2em;">✖</button>
+          </div>
+
           <div class="caja-escribir-comentario">
             <input type="text" id="input-nuevo-comentario" placeholder="Escribe una duda o comentario...">
             <button class="btn-enviar-comentario" onclick="enviarComentario('${tarea.id}')">Enviar</button>
@@ -97,8 +102,6 @@ async function abrirDetalle(id) {
     `;
 
     document.body.appendChild(modalOverlay);
-
-    // 🔥 TU LLAMADA A LA BASE DE DATOS
     cargarComentarios(tarea.id);
 
   } catch (error) {
@@ -107,45 +110,93 @@ async function abrirDetalle(id) {
 }
 
 function cerrarDetalle() {
+  comentarioPadreTarea = null; // Limpiar al cerrar
   const modal = document.getElementById("ventana-detalles");
-  if (modal) {
-    modal.remove();
-  }
+  if (modal) modal.remove();
 }
 
-// 🔥 TUS FUNCIONES DE COMENTARIOS INTACTAS
+//Funciones para manejar a quién le respondemos
+function prepararRespuestaTarea(idComentario, nombreUsuario) {
+  comentarioPadreTarea = idComentario;
+  document.getElementById("texto-respuesta-tarea").textContent = `Respondiendo a ${nombreUsuario}`;
+  document.getElementById("indicador-respuesta-tarea").style.display = "flex";
+  document.getElementById("input-nuevo-comentario").focus();
+}
+
+function cancelarRespuestaTarea() {
+  comentarioPadreTarea = null;
+  document.getElementById("indicador-respuesta-tarea").style.display = "none";
+}
+
+//Dibujar comentarios separados por padres e hijos
+// 🟢 Función para organizar y dibujar los hilos de forma recursiva
 async function cargarComentarios(tarea_id) {
   const contenedor = document.getElementById("lista-comentarios-modal");
   if (!contenedor) return;
 
   try {
-    const comentarios = await getComentariosTarea(tarea_id);
+    const todosLosComentarios = await getComentariosTarea(tarea_id);
     contenedor.innerHTML = ""; 
 
-    if (comentarios.length === 0) {
-      contenedor.innerHTML = '<p style="color: gray; font-size: 0.9em; text-align: center;">No hay comentarios aún. ¡Sé el primero!</p>';
+    if (todosLosComentarios.length === 0) {
+      contenedor.innerHTML = '<p style="color: gray; text-align: center;">No hay comentarios aún.</p>';
       return;
     }
 
-    comentarios.forEach(c => {
-      const div = document.createElement("div");
-      div.className = "comentario-item";
-      const hora = new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      div.innerHTML = `
-        <span class="comentario-autor">${c.usuarios?.nombre || "Usuario"} <span style="color: gray; font-weight: normal; font-size: 0.8em;">• ${hora}</span></span>
-        <span>${c.contenido}</span>
-      `;
-      contenedor.appendChild(div);
+    // 1. Crear un mapa para acceso rápido
+    const mapa = {};
+    todosLosComentarios.forEach(c => {
+      mapa[c.id] = { ...c, respuestas: [] };
     });
 
+    // 2. Construir el árbol de hilos
+    const raiz = [];
+    todosLosComentarios.forEach(c => {
+      if (c.comentario_padre_id && mapa[c.comentario_padre_id]) {
+        mapa[c.comentario_padre_id].respuestas.push(mapa[c.id]);
+      } else {
+        raiz.push(mapa[c.id]);
+      }
+    });
+
+    // 3. Función recursiva para dibujar
+    function dibujarArbol(lista, nivel = 0) {
+      lista.forEach(c => {
+        const div = document.createElement("div");
+        div.className = nivel > 0 ? "comentario-item comentario-respuesta" : "comentario-item";
+        
+        // Limitar la identación máxima para que no se salga de la pantalla en móviles
+        const margin = nivel > 0 ? 20 : 0;
+        div.style.marginLeft = `${margin}px`;
+
+        const hora = new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const nombreAutor = c.usuarios?.nombre || "Usuario";
+
+        div.innerHTML = `
+          <div class="comentario-autor">${nombreAutor} <span style="font-weight:normal; color:gray; font-size:0.8em;">• ${hora}</span></div>
+          <span class="comentario-texto">${c.contenido}</span>
+          <button class="btn-responder" onclick="prepararRespuestaTarea('${c.id}', '${nombreAutor}')">Responder</button>
+        `;
+        
+        contenedor.appendChild(div);
+
+        // Si tiene respuestas, las dibujamos justo debajo (Recursión)
+        if (c.respuestas.length > 0) {
+          dibujarArbol(c.respuestas, nivel + 1);
+        }
+      });
+    }
+
+    dibujarArbol(raiz);
     contenedor.scrollTop = contenedor.scrollHeight;
 
   } catch (error) {
+    console.error(error);
     contenedor.innerHTML = '<p style="color: red;">Error al cargar comentarios.</p>';
   }
 }
 
+//Enviar comentario
 async function enviarComentario(tarea_id) {
   const input = document.getElementById("input-nuevo-comentario");
   const contenido = input.value.trim();
@@ -158,7 +209,8 @@ async function enviarComentario(tarea_id) {
     const res = await postComentario({
       contenido,
       tarea_id,
-      usuario_id: idUsuario
+      usuario_id: idUsuario,
+      comentario_padre_id: comentarioPadreTarea
     });
 
     if (res.error) {
@@ -167,6 +219,7 @@ async function enviarComentario(tarea_id) {
     }
 
     input.value = "";
+    cancelarRespuestaTarea();
     cargarComentarios(tarea_id);
 
   } catch (error) {
